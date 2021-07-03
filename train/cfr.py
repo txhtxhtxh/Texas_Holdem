@@ -3,7 +3,7 @@ import numpy as np
 from test import multi_test
 from br import BRAgent
 from random_agent import RandomAgent
-from utils_leduc import encode_cards, fold_encode, deck, get_winner, round_card_num, deal_pokers
+from utils_kuhn import encode_cards, fold_encode, deck, get_winner, round_card_num, deal_pokers
 
 
 class CFRAgent:
@@ -75,7 +75,7 @@ class CFRAgent:
 
         # Update
         self.regret[cards_encoded][cur_node] += regret
-        self.average_policy[cards_encoded][cur_node] += action_prob * player_prob # * self.iterations
+        self.average_policy[cards_encoded][cur_node] += action_prob * player_prob * self.iterations
         return value
 
     def regret_matching(self, cards_encoded, history):
@@ -118,9 +118,9 @@ class CFRAgent:
 
 process_num = 20
 testing_num = 1000
-training_times = 300
-test_adjunct = 30
-game = "leduc"
+training_times = 1
+test_adjunct = training_times
+game = "kuhn"
 cfr_agent = CFRAgent(game)
 random_agent = RandomAgent(game)
 br_agent = BRAgent(game)
