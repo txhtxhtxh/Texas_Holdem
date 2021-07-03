@@ -1,6 +1,6 @@
 import numpy as np
 from copy import deepcopy
-from utils_leduc import encode_cards, fold_encode, deck, get_winner, round_card_num, deal_pokers
+from utils_kuhn import encode_cards, fold_encode, deck, get_winner, round_card_num, deal_pokers
 
 
 class BRAgent:
@@ -90,4 +90,9 @@ class BRAgent:
 
         for k, v in self.best_response.items():
             for h, j in v.items():
+                self.best_response[k][h] = np.ones(len(j)) / len(j)
+
+        for k, v in self.best_response.items():
+            for h, j in v.items():
                 self.best_response[k][h] = np.zeros(len(j))
+

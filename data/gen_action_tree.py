@@ -183,6 +183,30 @@ class LeducHoldem:
         np.save(f"{self.class_name}_game_result_tree.npy", self.end_tree, allow_pickle=True)
 
 
+class Kuhnpoker():
+    def __init__(self):
+        self.class_name = "kuhn"
+        self.legal_tree = {
+            "": [0, 0, ['c', 'b']],
+            "c": [1, 0, ['c', 'b']],
+            "cb": [0, 0, ['f', 'c']],
+            "b": [1, 0, ['f', 'c']],
+        }
+
+        self.end_tree = {
+            "cc": [[1, 1], None],
+            "cbf": [[1, 1], [-1., 1.]],
+            "cbc": [[2, 2], None],
+            "bf": [[1, 1], [1., -1.]],
+            "bc": [[2, 2], None]
+        }
+
+    def generate_tree(self):
+        np.save(f"{self.class_name}_legal_action_tree.npy", self.legal_tree, allow_pickle=True)
+        np.save(f"{self.class_name}_game_result_tree.npy", self.end_tree, allow_pickle=True)
+
+
+
 # # Limit Texas
 # tree = LimitTexasTree()
 # tree.generate_tree(chip_list=[200] * 2,
@@ -198,6 +222,9 @@ class LeducHoldem:
 #                    bb=0,
 #                    ante=1.)
 
+# Kuhn
+tree = Kuhnpoker()
+tree.generate_tree()
 
 led = np.load("../data/leduc_legal_action_tree.npy").item()
 led_result = np.load("../data/leduc_game_result_tree.npy").item()
