@@ -50,7 +50,6 @@ class BRAgent:
     def get_best_response(self, cur_node, cards, chance_prob, br_id):
         if cur_node in self.game_result_tree:
             return self.get_payoff(cards, cur_node, br_id)
-
         cur_id, cur_round, legal_action = self.legal_action_tree[cur_node]
         cards_encoded = self.encode_cards(cards, cur_id, cur_round)
         action_prob = self.tested_policy[cards_encoded][cur_node]
@@ -71,8 +70,8 @@ class BRAgent:
 
     def exploitability(self):
         result_list = []
-        for cards in self.all_cards:
-            for br_id in range(self.player_num):
+        for br_id in range(self.player_num):
+            for cards in self.all_cards:
                 self.get_best_response('', cards, 1., br_id)
 
         for k, v in self.best_response.items():
