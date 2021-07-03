@@ -30,12 +30,12 @@ def encode_cards(card_list):
     return "".join(sorted(card_list))
 
 
-def get_winner(hands):
+def get_winner(cards):
     result = ['32', '42', '43', '22', '33', '44']
     # Getting the result of the final round: seven cards
-    cards = [encode_cards(h) for h in hands]
-    h0 = sorted([cards[0][0], cards[0][2]], reverse=True)
-    h1 = sorted([cards[1][0], cards[1][2]], reverse=True)
+    card = [encode_cards(h) for h in cards]
+    h0 = sorted([card[0][0], card[0][2]], reverse=True)
+    h1 = sorted([card[1][0], card[1][2]], reverse=True)
     score_0 = result.index("".join(h0))
     score_1 = result.index("".join(h1))
 
@@ -60,16 +60,5 @@ def deal_pokers(res_poker):
             res_poker3 = res_poker2 - set(com2)
             for com3 in combinations(res_poker3, 1):
                 com3 = list(com3)
-                res_poker4 = res_poker3 - set(com3)
-                for com4 in combinations(res_poker4, 1):
-                    com4 = list(com4)
-                    result_list.append([com + com2, com3 + com4])
+                result_list.append([com + com3, com2 + com3])
     return result_list
-
-
-def random_deal(cards):
-    res_poker = list(cards)
-    cards_index = random.sample(range(len(res_poker)), 4)
-    hands = [[res_poker[cards_index[i]] for i in [0, 1]],  [res_poker[cards_index[i]] for i in [2, 3]]]
-    return hands
-

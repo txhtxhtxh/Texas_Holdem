@@ -130,7 +130,7 @@ class LeducHoldem:
             win_cal = None
             if action_sequence and action_sequence[-1] == fold_encode:
                 win_cal = observation[2]
-            self.end_tree[action_sequence] = [[min(min(in_chips_list),i) for i in in_chips_list],win_cal]
+            self.end_tree[action_sequence] = [[min(min(in_chips_list),i) for i in in_chips_list], win_cal]
             return
         action_set = []
         cur_env = deepcopy(env)
@@ -144,7 +144,7 @@ class LeducHoldem:
             if str_action == 'r':
                 new_raise_times = raise_times + 1
             encode_action = action_encode[str_action]
-            action = self.cal_action(str_action, observation, new_raise_times)
+            action = self.cal_action(str_action, observation, round_counter)
             self.legal_tree[action_sequence].append(encode_action)
             if (env.check_action(action) > -2) and (action not in action_set):
                 action_set.append(action)
@@ -176,91 +176,12 @@ class LeducHoldem:
         self.next_node(env=env,
                        action_sequence='',
                        observation=observation,
-                       in_chips_list=[sb, bb],
+                       in_chips_list=[sb + ante, bb + ante],
                        last_round=1,
                        raise_times=0)
         np.save(f"{self.class_name}_legal_action_tree.npy", self.legal_tree, allow_pickle=True)
         np.save(f"{self.class_name}_game_result_tree.npy", self.end_tree, allow_pickle=True)
 
-
-class Toy:
-    '''
-    This class is to generate a action tree for toy poker
-    '''
-    def __init__(self):
-        self.player_num = 2
-        self.end_tree = {}
-        self.class_name = "toy"
-        self.legal_tree = defaultdict(list)
-
-    def legal_action_space(self):
-        return ['f', 'c']
-
-    def cal_action(self, str_action, observation):
-        if str_action == 'f':
-            return -1
-
-        call_amount = max(observation[1]['res_chip']) - min(observation[1]['res_chip'])
-        if str_action == 'c':
-            return call_amount
-
-    def next_node(self, env, action_sequence, observation, in_chips_list, last_round, raise_times):
-        round_counter = observation[1]['round']
-        if observation[3] or round_counter == 2:
-            win_cal = None
-            if action_sequence and action_sequence[-1] == fold_encode:
-                win_cal = observation[2]
-            self.end_tree[action_sequence] = [[min(min(in_chips_list),i) for i in in_chips_list],win_cal]
-            return
-        action_set = []
-        cur_env = deepcopy(env)
-        cur_player = cur_env.cur_player_index
-        new_raise_times = raise_times
-
-        if round_counter > last_round:
-            new_raise_times = 0
-
-        for str_action in self.legal_action_space():
-            if str_action == 'r':
-                new_raise_times = raise_times + 1
-            encode_action = action_encode[str_action]
-            action = self.cal_action(str_action, observation, )
-            self.legal_tree[action_sequence].append(encode_action)
-            if (env.check_action(action) > -2) and (action not in action_set):
-                action_set.append(action)
-                new_observation = cur_env.step(action)
-                action2 = max(action, 0)
-                next_in_chips_list = [in_chips_list[i]+action2
-                                      if i == cur_player else in_chips_list[i] for i in range(2)]
-                self.next_node(cur_env, action_sequence + encode_action,
-                               new_observation, next_in_chips_list, observation[1]['round'], new_raise_times)
-                del cur_env
-                cur_env = deepcopy(env)
-        if action_sequence in self.legal_tree:
-            self.legal_tree[action_sequence] = [cur_player, round_counter - 1, self.legal_tree[action_sequence]]
-
-    def generate_tree(self, chip_list, sb, bb, ante):
-        env = Holdem_hand_env(
-            agent_list=[i for i in range(2)],
-            chips_list=chip_list,
-            sb=sb,
-            bb=bb,
-            D=0,
-            straddle=0,
-            ante=ante)
-        # observation consists of: cur_player_index,  obs,  R,  done, info
-        env.reset()
-        observation = env.step(0)
-        # Start building a tree
-        # starting round is set to be one
-        self.next_node(env=env,
-                       action_sequence='',
-                       observation=observation,
-                       in_chips_list=[sb, bb],
-                       last_round=1,
-                       raise_times=0)
-        np.save(f"{self.class_name}_legal_action_tree.npy", self.legal_tree, allow_pickle=True)
-        np.save(f"{self.class_name}_game_result_tree.npy", self.end_tree, allow_pickle=True)
 
 # # Limit Texas
 # tree = LimitTexasTree()
@@ -269,23 +190,17 @@ class Toy:
 #                    bb=2,
 #                    ante=0)
 #
-# # Leduc
+
+# Leduc
 # tree = LeducHoldem()
-# tree.generate_tree(chip_list=[200] * 2,
+# tree.generate_tree(chip_list=[199] * 2,
 #                    sb=0,
 #                    bb=0,
-#                    ante=1)
-#
+#                    ante=1.)
 
-# # Toypoker
-# tree = Toy()
-# tree.generate_tree(chip_list=[200] * 2,
-#                    sb=0,
-#                    bb=0,
-#                    ante=1)
 
-toy = np.load("../data/toy_legal_action_tree.npy").item()
-toy_result = np.load("../data/toy_game_result_tree.npy").item()
+led = np.load("../data/leduc_legal_action_tree.npy").item()
+led_result = np.load("../data/leduc_game_result_tree.npy").item()
 
-print(toy)
-print(toy_result)
+print(led)
+print(led_result)
