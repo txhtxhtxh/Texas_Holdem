@@ -1,5 +1,7 @@
-- Runing CFR on Kuhn Poker:
+- Running CFR and XDO on Kuhn Poker
 ```
 cd train
-python cfr.py
+python3 xdo.py
 ```
+The exploitability results are in the plot file.
+
