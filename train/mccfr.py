@@ -125,8 +125,7 @@ for train_step in range(training_times):
         output_path = f"../data/cfr_train_data_{train_step}.npy"
         mccfr_agent.save_agent(output_path)
         # multi_test([cfr_agent, random_agent], process_num=process_num, testing_num=testing_num, game=cfr_agent.game)
-        br_agent.load_policy(output_path)
-        exp = br_agent.exploitability()
+        exp = br_agent.exploitability(output_path)
         print(train_step, exp)
         results.append(exp)
 print("Done")
