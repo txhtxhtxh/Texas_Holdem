@@ -73,9 +73,8 @@ class BRAgent:
 
         if cur_node in self.game_result_tree:
             return self.get_payoff(cards, cur_node, br_id)
-
         cur_id, cur_round, legal_action = self.legal_action_tree[cur_node]
-        cards_encoded = self.encode_cards(cards, cur_id, cur_round)
+        cards_encoded = self.card2str(cards, cur_id, cur_round)
         restricted_actions = self.get_restricted_actions(cards_encoded, cur_node, legal_action)
         action_prob = self.tested_policy[cards_encoded][cur_node]
         action_values = np.zeros(len(action_prob))
@@ -97,7 +96,7 @@ class BRAgent:
             return self.get_payoff(cards, cur_node, br_id)
 
         cur_id, cur_round, legal_action = self.legal_action_tree[cur_node]
-        cards_encoded = self.encode_cards(cards, cur_id, cur_round)
+        cards_encoded = self.card2str(cards, cur_id, cur_round)
         restricted_actions = self.get_restricted_actions(cards_encoded, cur_node, legal_action)
 
         if cur_id == br_id:
@@ -121,7 +120,7 @@ class BRAgent:
             payoff = win_cal[player_id]
         return payoff
 
-    def encode_cards(self, cards, cur_id, cur_round):
+    def card2str(self, cards, cur_id, cur_round):
         return encode_cards(cards[cur_id][:round_card_num[cur_round]])
 
     def get_restricted_actions(self, cards_encoded, cur_node, legal_action):
