@@ -3,12 +3,13 @@ import numpy as np
 from copy import deepcopy
 from br import BRAgent
 from cfr import CFRAgent
+from kuhn.utils import encode_cards, fold_encode, deck, get_winner, round_card_num, deal_pokers
 
 
 class OXDOAgent:
-    def __init__(self, game, encode_cards, fold_encode, deck, get_winner, round_card_num, deal_pokers):
-        self.nash_finder = CFRAgent(game, encode_cards, fold_encode, deck, get_winner, round_card_num, deal_pokers)
-        self.br = BRAgent(game, encode_cards, fold_encode, deck, get_winner, round_card_num, deal_pokers)
+    def __init__(self, game):
+        self.nash_finder = CFRAgent(game)
+        self.br = BRAgent(game)
         self.game = game
         self.action_tree = {}
         self.player_num = 2
@@ -71,7 +72,7 @@ class OXDOAgent:
         return full_policy
 
     def train(self):
-        # Getting epsilon Nash
+        # Update once
         nash_policy = self.nash_finder.train(
             restricted_tree=self.restricted_game,
             from_scratch=self.from_scratch)
@@ -103,3 +104,28 @@ class OXDOAgent:
 
     def load_agent(self, data_pth):
         self.regret, self.average_policy = np.load(data_pth, allow_pickle=True)
+        
+if __name__ == "__main__":
+    process_num = 20
+    training_times = 10000
+    test_adjunct = 1
+    game = "kuhn"
+    xodo_agent = XODOAgent(game)
+    br_agent = BRAgent(game)
+
+
+    print("start training")
+    start = time.time()
+    results, times = [], []
+    for train_step in range(training_times):
+        policy = xodo_agent.train()
+        if (train_step + 1) % test_adjunct == 0:
+            # multi_test([cfr_agent, random_agent], process_num=process_num, testing_num=testing_num, game=cfr_agent.game)
+            exp = br_agent.exploitability(policy)
+            print(time.time() - start, exp)
+            if exp < 0:
+                raise Exception("Exploitability negative")
+            times.append(time.time() - start)
+            results.append(exp)
+    print("Done")
+    pd.DataFrame({"times": times, "exp": results}).to_csv("../plot/xodo_kuhn_exploitability")
