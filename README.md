@@ -1,4 +1,4 @@
-- To install the python requirements:
+- Before running experiments, we need to install the python requirements:
 ```
 pip install -r requirements.txt 
 ```
