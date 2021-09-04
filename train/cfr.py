@@ -145,31 +145,31 @@ class CFRAgent:
     def load_agent(self, data_pth):
         self.regret, self.average_policy = np.load(data_pth, allow_pickle=True)
 
+if __name__ == "__main__":
+    process_num = 20
+    testing_num = 1000
+    training_times = 10 * 10000
+    test_adjunct = 1
+    game = "kuhn"
+    cfr_agent = CFRAgent(game)
+    random_agent = RandomAgent(game)
+    br_agent = BRAgent(game)
 
-process_num = 20
-testing_num = 1000
-training_times = 10 * 10000
-test_adjunct = 1
-game = "kuhn"
-cfr_agent = CFRAgent(game)
-random_agent = RandomAgent(game)
-br_agent = BRAgent(game)
 
-
-print("start training")
-start = time.time()
-results, times = [], []
-for train_step in range(training_times):
-    policy = cfr_agent.train(
-        restricted_tree=None
-    )
-    if (train_step + 1) % test_adjunct == 0:
-        # multi_test([cfr_agent, random_agent], process_num=process_num, testing_num=testing_num, game=cfr_agent.game)
-        exp = br_agent.exploitability(policy)
-        if exp < 0:
-            raise Exception("Exploitability negative")
-        times.append((time.time() - start))
-        print(times[-1], exp)
-        results.append(exp)
-print("Done")
-pd.DataFrame({"times": times, "exp": results}).to_csv("../plot/cfr_kuhn_exploitability")
+    print("start training")
+    start = time.time()
+    results, times = [], []
+    for train_step in range(training_times):
+        policy = cfr_agent.train(
+            restricted_tree=None
+        )
+        if (train_step + 1) % test_adjunct == 0:
+            # multi_test([cfr_agent, random_agent], process_num=process_num, testing_num=testing_num, game=cfr_agent.game)
+            exp = br_agent.exploitability(policy)
+            if exp < 0:
+                raise Exception("Exploitability negative")
+            times.append((time.time() - start))
+            print(times[-1], exp)
+            results.append(exp)
+    print("Done")
+    pd.DataFrame({"times": times, "exp": results}).to_csv("../plot/cfr_kuhn_exploitability")
